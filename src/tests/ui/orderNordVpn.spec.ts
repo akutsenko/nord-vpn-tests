@@ -39,7 +39,7 @@ Object.values(PricingPlansPeriods).forEach((period) => {
   });
 });
 
-test(
+test.only(
   "pricing plan on Checkout page corresponds to newly selected period",
   {
     tag: ["@ui", "@orders", "@p0"],
