@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "ip": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "isp": {
+      "type": "string"
+    },
+    "isp_asn": {
+      "type": "number"
+    },
+    "protected": {
+      "type": "boolean"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "state_code": {
+      "type": "string"
+    },
+    "zip_code": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ip",
+    "country",
+    "country_code",
+    "city",
+    "isp",
+    "isp_asn",
+    "protected",
+    "longitude",
+    "latitude",
+    "state_code",
+    "zip_code"
+  ]
+}

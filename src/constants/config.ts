@@ -1,0 +1,6 @@
+export enum TimeoutValues {
+  SHORT_TIMEOUT = 10000,
+  DEFAULT_TIMEOUT = 20000,
+  LONG_TIMEOUT = 30000,
+  HUGE_TIMEOUT = 60000,
+}
