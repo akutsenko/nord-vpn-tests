@@ -219,88 +219,105 @@ test.describe(
 //TODO: investigate option to start chromium with vpn extension + connect to some vpn server in fixture
 // Then run GET "/v1/helpers/ips/insights" and check that IP data correspond to vpn server + 'protected' is true
 
-test.describe("when request has fuzz headers", () => {
-  for (const header of INVALID_HEADERS) {
-    test(`${INSIGHTS_RELATIVE_URL} handles ${header} header`, async ({
-      request,
-      page,
-    }) => {
-      const insightsResponse = await getInsights({
+test.describe(
+  "when request has fuzz headers",
+  {
+    tag: ["@api", "@insights"],
+  },
+  () => {
+    for (const header of INVALID_HEADERS) {
+      test(`${INSIGHTS_RELATIVE_URL} handles ${header} header`, async ({
         request,
         page,
-        options: { headers: { "X-Fuzz": header } },
+      }) => {
+        const insightsResponse = await getInsights({
+          request,
+          page,
+          options: { headers: { "X-Fuzz": header } },
+        });
+        expect(insightsResponse.status(), "Response status should be 200").toBe(
+          200,
+        );
+        const insughtsResponseBody = await insightsResponse.json();
+        expect(
+          insughtsResponseBody.ip,
+          `'ip' value should be any string`,
+        ).toEqual(expect.any(String));
       });
-      expect(insightsResponse.status(), "Response status should be 200").toBe(
-        200,
-      );
-      const insughtsResponseBody = await insightsResponse.json();
-      expect(
-        insughtsResponseBody.ip,
-        `'ip' value should be any string`,
-      ).toEqual(expect.any(String));
-    });
-  }
-});
+    }
+  },
+);
 
 // TODO: clarify the rate limit for service and if 429 should be returned. Rewrite test in performance tool
-test(`${INSIGHTS_RELATIVE_URL} does not return 429 Too Many Requests for 100 concurrent requests`, async ({
-  request,
-  page,
-}) => {
-  const CONCURRENT_REQUESTS = 100;
-  const promises = [];
+test(
+  `${INSIGHTS_RELATIVE_URL} does not return 429 Too Many Requests for 100 concurrent requests`,
+  {
+    tag: ["@api", "@insights"],
+  },
+  async ({ request, page }) => {
+    const CONCURRENT_REQUESTS = 100;
+    const promises = [];
 
-  // Queue all requests as close to simultaneously as possible
-  for (let i = 0; i < CONCURRENT_REQUESTS; i++) {
-    promises.push(getInsights({ request, page }));
-  }
+    // Queue all requests as close to simultaneously as possible
+    for (let i = 0; i < CONCURRENT_REQUESTS; i++) {
+      promises.push(getInsights({ request, page }));
+    }
 
-  const responses = await Promise.all(promises);
-  const throtledResponses = responses.filter((r) => r.status() === 429).length;
-  expect(
-    throtledResponses,
-    `service should properly respond for each of ${CONCURRENT_REQUESTS} concurrent requests`,
-  ).toEqual(0);
-});
+    const responses = await Promise.all(promises);
+    const throtledResponses = responses.filter(
+      (r) => r.status() === 429,
+    ).length;
+    expect(
+      throtledResponses,
+      `service should properly respond for each of ${CONCURRENT_REQUESTS} concurrent requests`,
+    ).toEqual(0);
+  },
+);
 
-test(`Response from ${INSIGHTS_RELATIVE_URL} hides server/internal headers`, async ({
-  request,
-  page,
-}) => {
-  const insightsResponse = await getInsights({ request, page });
-  const headers = insightsResponse.headers();
-  const sensitiveHeaders = [
-    "server",
-    "x-powered-by",
-    "x-aspnet-version",
-    "x-internal-ip",
-  ];
+test(
+  `Response from ${INSIGHTS_RELATIVE_URL} hides server/internal headers`,
+  {
+    tag: ["@api", "@insights"],
+  },
+  async ({ request, page }) => {
+    const insightsResponse = await getInsights({ request, page });
+    const headers = insightsResponse.headers();
+    const sensitiveHeaders = [
+      "server",
+      "x-powered-by",
+      "x-aspnet-version",
+      "x-internal-ip",
+    ];
 
-  sensitiveHeaders.forEach((header) => {
-    expect
-      .soft(headers[header], `Response should not contain '${header}' header`)
-      .toBeUndefined();
-  });
-});
+    sensitiveHeaders.forEach((header) => {
+      expect
+        .soft(headers[header], `Response should not contain '${header}' header`)
+        .toBeUndefined();
+    });
+  },
+);
 
-test(`Mandatory security headers are set in response for ${INSIGHTS_RELATIVE_URL}`, async ({
-  request,
-  page,
-}) => {
-  const insightsResponse = await getInsights({ request, page });
-  const headers = insightsResponse.headers();
-  const softExpect = expect.configure({ soft: true });
+test(
+  `Mandatory security headers are set in response for ${INSIGHTS_RELATIVE_URL}`,
+  {
+    tag: ["@api", "@insights"],
+  },
+  async ({ request, page }) => {
+    const insightsResponse = await getInsights({ request, page });
+    const headers = insightsResponse.headers();
+    const softExpect = expect.configure({ soft: true });
 
-  softExpect(
-    headers["x-content-type-options"],
-    `response header 'x-content-type-options' should have value 'nosniff'`,
-  ).toBe("nosniff");
-  softExpect(
-    headers["x-frame-options"],
-    `response header 'x-frame-options' should have value 'deny'`,
-  ).toBe("deny");
-  softExpect(
-    headers["strict-transport-security"],
-    `response header 'strict-transport-security' should contain 'max-age' value`,
-  ).toMatch(/max-age=\d+/i);
-});
+    softExpect(
+      headers["x-content-type-options"],
+      `response header 'x-content-type-options' should have value 'nosniff'`,
+    ).toBe("nosniff");
+    softExpect(
+      headers["x-frame-options"],
+      `response header 'x-frame-options' should have value 'deny'`,
+    ).toBe("deny");
+    softExpect(
+      headers["strict-transport-security"],
+      `response header 'strict-transport-security' should contain 'max-age' value`,
+    ).toMatch(/max-age=\d+/i);
+  },
+);
