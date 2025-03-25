@@ -12,7 +12,7 @@ By default, tests load environment variables from `.env.test`. To use a differen
 ENVIRONMENT="dev" npx playwright test
 ```
 
-There are 2 sensitive env variables(secrets). Their values should be stored as secrets on CI server and used in the pipeline(like it's done in `.github/workflows/playwright.yml`). Please reach out to recruiter to get them and paste their values into appropriate `.env.<ENVIRONMENT>` file
+There are 2 sensitive env variables(secrets). Their values should be stored as secrets on CI server and used in the pipeline(like it's done in `.github/workflows/playwright.yml`). Please find their values in the notion document and paste their values into appropriate `.env.<ENVIRONMENT>` file
 
 ```sh
 IPFLAIR_API_KEY="<some value>"
