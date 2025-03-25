@@ -1,4 +1,4 @@
-import { type Page, Locator } from "@playwright/test";
+import { type Page, Locator, test } from "@playwright/test";
 import { createCommonPage } from "./common/commonPage";
 
 export const createLoginPage = (page: Page) => {
@@ -29,6 +29,16 @@ export const createLoginPage = (page: Page) => {
     name: "Forgot your password?",
   });
 
+  const waitForLoad = async () => {
+    await test.step(`user checks that Login page has been loaded`, async () => {
+      await Promise.all([
+        page.waitForURL(URL_REGEX),
+        nordAccountLogo.waitFor({ state: "visible" }),
+        loginText.waitFor({ state: "visible" }),
+      ]);
+    });
+  };
+
   return {
     commonPage,
     URL_REGEX,
@@ -41,6 +51,7 @@ export const createLoginPage = (page: Page) => {
     getOneTimeLoginCodeButton,
     signUpLink,
     forgotYourPasswordLink,
+    waitForLoad,
   };
 };
 

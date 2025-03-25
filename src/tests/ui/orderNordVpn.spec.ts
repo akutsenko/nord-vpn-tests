@@ -44,7 +44,7 @@ test(
   {
     tag: ["@ui", "@orders", "@p0"],
   },
-  async ({ landingPage, pricingPage, checkoutPage, page }) => {
+  async ({ landingPage, pricingPage, checkoutPage }) => {
     const initialPeriod = PricingPlansPeriods.ONE_YEAR;
     const newPeriod = PricingPlansPeriods.ONE_MONTH;
     const plan = PricingPlans.COMPLETE;
